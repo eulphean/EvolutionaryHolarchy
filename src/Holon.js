@@ -29,7 +29,7 @@ class Holon {
     assignGenes() {
         // Red, Green, Blue. 
         for (var i = 0; i < 3; i++) {
-            this.genes[i] = random(0, 1); 
+            this.genes[i] = random(0, 1.0); 
         }
 
         // Width (create a small width to start with)

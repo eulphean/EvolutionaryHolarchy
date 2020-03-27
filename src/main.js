@@ -1,6 +1,5 @@
 var population; 
-var rowHeight = 20; 
-var generation = 0; 
+var rowHeight = 20;  
 
 // ------------------------------- Sketch Setup ------------------------------
 function setup() {
@@ -20,11 +19,13 @@ function draw() {
 
   // Crossover & Mutation
   population.reproduction(); 
-
+  
   // noLoop();
 
-  // Keep track of total mutation generations
-  generation++;  
 
   // print(frameCount);
+}
+
+function keyPressed() {
+  draw(); 
 }
