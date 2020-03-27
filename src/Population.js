@@ -16,7 +16,7 @@ class Population {
         this.numFitnessDivisions = 4; 
         
         this.crossoverProbability = 0.3;
-        this.mutationProbability = 0.1; 
+        this.mutationProbability = 0.01; 
 
         this.createInitialPopulation();
         this.createEvolutionTargets();
@@ -57,7 +57,7 @@ class Population {
         this.targetGenes = []; 
         // Target colors. 
         for (var i = 0; i < 3; i++) {
-            this.targetGenes.push(0); // 80-100% just to see how it works. 
+            this.targetGenes.push(random(0, 1)); // 80-100% just to see how it works. 
         }
 
         // Set target width
@@ -108,27 +108,20 @@ class Population {
             var colorMag = p5.Vector.mag(p5.Vector.sub(targetColorVector, currentColorVector));
             var widthMag = Math.abs(this.targetGenes[2] - h.genes[2]); 
             h.fitness = Math.pow(2, 1/(colorMag + widthMag)); 
-            totalFitness += h.fitness
-        }
-
-        //print ('Total Fitness: ' + totalFitness); 
-        for (var h of this.holons) {
-            h.fitness = h.fitness/ totalFitness;
-            //print (h.fitness);
         }
     }
 
     createMatingPool() {
         this.matingPool = []; 
-        // for (var h of this.holons) {
-        //     var v = random(1); 
-        //     if (v <= h.fitness) {
-        //         print ('Random, Fitness: ' + v + ', ' + h.fitness);
-        //         this.matingPool.push(h); 
-        //     }
-        // }
 
-        print ('Mating Pool Size: ' + this.matingPool.length);
+        // Sort holons first. 
+        var sortedHolons = _.sortBy(this.holons, ['fitness']); 
+        // Put reduction in a variable. 
+        var ratio = map (this.generation, 0, pow(2, 9), 0.1, 0.9);
+        var reduction = ratio * sortedHolons.length; // 10% reduction
+        // Reduce the holons. 
+        this.matingPool = sortedHolons.slice(reduction, sortedHolons.length);
+        // print(this.matingPool);
     }
 
     crossover(holonA, holonB, newPos) {
@@ -152,7 +145,7 @@ class Population {
                 } else {
                     min = this.targetGenes[i]; max = holon.genes[i];
                 }
-                var newVal = map(this.generation, 0, Math.pow(2,15), min, max); 
+                var newVal = map(this.generation, 0, Math.pow(2,10), min, max); 
                 holon.genes[i] = newVal; 
             }
         }

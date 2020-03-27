@@ -20,8 +20,7 @@ function draw() {
   // Crossover & Mutation
   population.reproduction(); 
   
-  // noLoop();
-
+  //noLoop();
 
   // print(frameCount);
 }
