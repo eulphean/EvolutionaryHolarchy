@@ -21,6 +21,8 @@ function draw() {
   // Crossover & Mutation
   population.reproduction(); 
 
+  // noLoop();
+
   // Keep track of total mutation generations
   generation++;  
 

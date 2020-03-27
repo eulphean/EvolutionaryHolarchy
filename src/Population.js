@@ -1,8 +1,7 @@
-// A cell is a spot in the farm that can be planted with a transaction. 
 class Population {
     constructor(rHeight) {
-        this.holons = [];  
-        this.matingPool = []; 
+        this.holons = []; 
+        this.matingPool = [];  
         this.rowHeight = rHeight; 
 
         this.runningYPos = 0; 
@@ -17,9 +16,10 @@ class Population {
         this.numFitnessDivisions = 4; 
         
         this.crossoverProbability = 0.3;
-        this.mutationProbability = 0.001; 
+        this.mutationProbability = 0.1; 
 
         this.createInitialPopulation();
+        this.createEvolutionTargets();
     }
 
     draw() {
@@ -49,6 +49,21 @@ class Population {
         print("Max Width, Min Width: " + this.maxHolonWidth + ", " + this.minHolonWidth); 
     }
 
+    createEvolutionTargets() {
+        // Determines the direction of evolution. 
+        this.targetGenes = []; 
+        // Target colors. 
+        for (var i = 0; i < 3; i++) {
+            this.targetGenes.push(random(0.8, 1)); // 80-100% just to see how it works. 
+        }
+
+        this.targetGenes[0] = 1; this.targetGenes[1] = 1; this.targetGenes[2] = 1; 
+        // Set target width
+        this.targetGenes.push(random(0.5, 1)); // 80-100% just to see how it works. 
+
+        print ("Target Gene is " + this.targetGenes);
+    }
+
     selection() {
         print ("start selection"); 
         this.assignFitness();
@@ -57,12 +72,16 @@ class Population {
     }
    
     reproduction() {
-        print ("start reproduction"); 
-        // Clear the original array. 
-        this.holons.length = 0;
+         print ("start reproduction"); 
+        // Clear original holons.  
+        if (this.matingPool.length === 0) {
+            this.matingPool = this.holons;
+        }
+        this.holons = []; 
         while (this.runningXPos < width) {
             var pos = createVector(this.runningXPos, this.runningYPos); 
             var holonA = this.getRandomMatingHolon();
+            print('HolonA: ' + holonA); print('HolonB: ' + holonB);
             var holonB = this.getRandomMatingHolon();
            // print (holonA); print (holonB); 
             var newHolon = this.crossover(holonA, holonB, pos); 
@@ -80,49 +99,44 @@ class Population {
     }
 
     assignFitness() {
-        var factor = (this.maxHolonWidth - this.minHolonWidth) / this.numFitnessDivisions; 
-        var extent1 = this.minHolonWidth + factor; 
-        var extent2 = extent1 + factor; 
-        var extent3 = extent2 + factor; 
+        var targetColorVector = createVector(this.targetGenes[0], this.targetGenes[1], this.targetGenes[2]); 
+        var totalFitness = 0; 
+        // Set fitness. 
         for (var h of this.holons) {
-            if (h.size.x > this.minHolonWidth && h.size.x < extent1) {
-                h.fitness = 0; 
-            } else if (h.size.x > extent1 && h.size.x < extent2) {
-                h.fitness = 1; // 20%
-            } else if (h.size.x > extent2 && h.size.x < extent3) {
-                h.fitness = 2; // 30% 
-            } else {
-                h.fitness = 3; // 50%
-            }
+            var currentColorVector = createVector(h.genes[0], h.genes[1], h.genes[2]);
+            var colorMag = p5.Vector.mag(p5.Vector.sub(targetColorVector, currentColorVector));
+            var widthMag = Math.abs(this.targetGenes[2] - h.genes[2]); 
+            h.fitness = colorMag + widthMag; 
+            totalFitness += h.fitness; 
+        }
+
+        // Normalize fitness (now all holons have a fitness between 0-1)
+        // We will use these fitnesses as probabilities to select Holons
+        // for the next evolution iteration. 
+        for (var h of this.holons) {
+            var normal = h.fitness / totalFitness; 
+            h.fitness = normal; // I can square this number to get a better probability 
         }
     }
 
     createMatingPool() {
+        this.matingPool = []; 
         for (var h of this.holons) {
-            if (h.fitness === 1) {
-                if (random(1) < 0.2) { // 20% chance. 
-                    this.matingPool.push(h);
-                }
-            } else if (h.fitness === 2) {
-                if (random(1) < 0.3) { // 30% chance. 
-                    this.matingPool.push(h);
-                }
-            } else if (h.fitness === 3) {
-                if (random(1) < 0.5) { // 50% chance. 
-                    this.matingPool.push(h); 
-                }
+            if (random(1) <= h.fitness) {
+                this.matingPool.push(h); 
             }
         }
     }
 
     crossover(holonA, holonB, newPos) {
         var newGenes=[]; 
+        var genesA = holonA.genes; var genesB = holonB.genes; 
         for (var i = 0; i < holonA.genes.length; i++) {
-            if (random(1) < this.crossoverProbability) {
-                newGenes[i] = holonA.genes[i];
-            } else {
-                newGenes[i] = holonB.genes[i]; 
-            }
+          if (random(1) < this.crossoverProbability) {
+              newGenes[i] = genesA[i] >= genesB[i] ? genesA[i] : genesB[i];
+          } else {
+              newGenes[i] = random(1) < 0.5 ? genesA[i] : genesB[i];  
+          }
         }
 
         // Prepare new holon and copy the genes. 
@@ -138,12 +152,11 @@ class Population {
         if (random(1) < this.mutationProbability) {
             var len = holon.genes.length;
             for (var i = 0; i < len-1; i++) {
-                holon.genes[i] = random(1);
+                var a = map(frameCount, 0, Math.pow(2, 12), holon.genes[i], this.targetGenes[i]); 
+                holon.genes[i] = a;
             }
 
-            // Mutate width seperately. 
-            // TODO: Complete aesthetic decision here. 
-            var num = map(frameCount, 0, Math.pow(2, 13), 0, 1);
+            var num = map(frameCount, 0, Math.pow(2, 12), holon.genes[3], this.targetGenes[3]);
             holon.genes[len-1] = num
         }
     }

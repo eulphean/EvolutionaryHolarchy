@@ -1,8 +1,8 @@
 class Holon {
     constructor(pos, h) {
         // Width is evolving with time. 
-        this.maxInitialWidth = 0.001;
-        this.maxInitialColor = 0.001; 
+        this.maxInitialWidth = 0.01;
+        this.maxInitialColor = 0.1; 
 
         // R, G, B, W (Red, Green, Blue, Width) are the genotypes. 
         this.genes = []; 
