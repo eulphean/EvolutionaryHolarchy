@@ -1,6 +1,10 @@
 class Holon {
     constructor(pos, h) {
-        this.initialWidthMax = 0.001
+        // Width is evolving with time. 
+        this.maxInitialWidth = 0.001;
+        this.maxInitialColor = 0.001; 
+
+        // R, G, B, W (Red, Green, Blue, Width) are the genotypes. 
         this.genes = []; 
         this.fitness = 0; 
         this.assignGenes(); 
@@ -18,14 +22,18 @@ class Holon {
         pop(); 
     }
 
+    updateSize() {
+        this.size.x = this.getWidthFromGenes();
+    }
+
     assignGenes() {
-        // Hue, Saturdation, Brightness.
+        // Red, Green, Blue. 
         for (var i = 0; i < 3; i++) {
             this.genes[i] = random(0, 1); 
         }
 
-        // Width
-        this.genes[3] = random(0, this.initialWidthMax); 
+        // Width (create a small width to start with)
+        this.genes[3] = random(0, this.maxInitialWidth); 
     }
 
     getWidthFromGenes() {
@@ -33,13 +41,9 @@ class Holon {
     }
 
     createColorFromGenes() {
-        var hue = map(this.genes[0], 0, 1, 0, 255); 
-        var saturation = map(this.genes[1], 0, 1, 0, 255); 
-        var brightness = map(this.genes[2], 0, 1, 0, 255); 
-        return color(hue, saturation, brightness); 
-    }
-
-    updateSize() {
-        this.size.x = this.getWidthFromGenes();
+        var red = map(this.genes[0], 0, 1, 0, 255); 
+        var green = map(this.genes[1], 0, 1, 0, 255); 
+        var blue = map(this.genes[2], 0, 1, 0, 255); 
+        return color(red, green, blue); 
     }
 };

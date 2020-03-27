@@ -4,7 +4,6 @@ var generation = 0;
 
 // ------------------------------- Sketch Setup ------------------------------
 function setup() {
-  colorMode(HSB); 
   createCanvas(windowWidth, windowHeight); 
   population = new Population(rowHeight); 
 }
@@ -12,16 +11,18 @@ function setup() {
 // ------------------------------- Sketch Draw (loop) ------------------------
 function draw() {
   population.draw(); 
+  // Remap yPos to the top of the canvas. 
   if (population.runningYPos >= height) {
     population.runningYPos = 0;
   }
+  // Mating pool & Assign Fitness
   population.selection();
+
+  // Crossover & Mutation
   population.reproduction(); 
+
+  // Keep track of total mutation generations
   generation++;  
 
-  print(frameCount);
-
-  // Have I reached the end? 
-  // If yes, stop drawing
-  // If no, draw the 
+  // print(frameCount);
 }
