@@ -3,6 +3,7 @@ var rowHeight = 20;
 
 // ------------------------------- Sketch Setup ------------------------------
 function setup() {
+  frameRate(15);
   createCanvas(windowWidth, windowHeight); 
   population = new Population(rowHeight); 
 }
