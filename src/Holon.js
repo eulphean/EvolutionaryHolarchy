@@ -33,17 +33,17 @@ class Holon {
         }
 
         // Width (create a small width to start with)
-        this.genes[3] = random(0, this.maxInitialWidth); 
+        this.genes[3] = random(0.05, this.maxInitialWidth); 
     }
 
     getWidthFromGenes() {
-        return map(this.genes[3], 0, 1, 0, width); 
+        return map(this.genes[3], 0, 1, 0, width, true); 
     }
 
     createColorFromGenes() {
-        var red = map(this.genes[0], 0, 1, 0, 255); 
-        var green = map(this.genes[1], 0, 1, 0, 255); 
-        var blue = map(this.genes[2], 0, 1, 0, 255); 
+        var red = map(this.genes[0], 0, 1, 0, 255, true); 
+        var green = map(this.genes[1], 0, 1, 0, 255, true); 
+        var blue = map(this.genes[2], 0, 1, 0, 255, true); 
         return color(red, green, blue); 
     }
 };

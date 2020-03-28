@@ -14,15 +14,13 @@ function draw() {
   if (population.runningYPos >= height) {
     population.runningYPos = 0;
   }
+  population.evaluateStateChange(); 
+
   // Mating pool & Assign Fitness
   population.selection();
 
   // Crossover & Mutation
   population.reproduction(); 
-  
-  //noLoop();
-
-  // print(frameCount);
 }
 
 function keyPressed() {
